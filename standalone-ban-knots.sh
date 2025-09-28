@@ -294,7 +294,7 @@ if [[ "$INSTALL_CRON" == "true" ]]; then
     fi
     
     # Propagate Umbrel mode, if needed
-    if [[ "IS_UMBREL" == "true" ]]; then
+    if [[ "$IS_UMBREL" == "true" ]]; then
         CRON_CMD="$CRON_CMD --umbrel"
     fi
     

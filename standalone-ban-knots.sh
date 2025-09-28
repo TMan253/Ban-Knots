@@ -37,6 +37,7 @@ DEFAULT_BITCOIN_CONF_PATHS=(
     "$HOME/Library/Application Support/Bitcoin/bitcoin.conf"
     "/etc/bitcoin/bitcoin.conf"
 )
+LOG_ROTATE_CONF_PATH="/etc/logrotate.d/ban-knots.conf"
 
 # Detect if running on Start9
 IS_START9=false
@@ -97,6 +98,28 @@ Example:
 
 EOF
     exit 1
+}
+
+# Function to write logrotate config file
+write_logrotate_config() {
+    cat > "$LOG_ROTATE_CONF_PATH" << EOF
+# Rotate and prune standalong-ban-knots logs.
+
+nocompress
+nomail
+missingok
+ifempty
+
+/tmp/ban-knots.log {
+  daily
+  rotate 8
+  dateyesterday
+  extension log
+  dateext
+  dateformat %Y-%m-%d.
+}
+
+EOF
 }
 
 # Function to read config file
@@ -252,6 +275,21 @@ if [[ "$UNINSTALL_CRON" == "true" ]]; then
     echo "Removing ban-knots from crontab..."
     crontab -l 2>/dev/null | grep -v "standalone-ban-knots.sh" | crontab -
     echo "Cron job removed successfully"
+
+    echo "Removing ban-knots from logrotate..."
+    if rm "$LOG_ROTATE_CONF_PATH" ; then
+        echo "Logrotate config removed successfully"
+    else
+        echo "Unable to remove logrotate config"
+    fi
+
+    echo "Removing ban-knots logs..."
+    if rm /tmp/ban-knots*.log ; then
+        echo "Logs removed successfully"
+    else
+        echo "Unable to remove logs"
+    fi
+    
     exit 0
 fi
 
@@ -332,6 +370,9 @@ if [[ "$INSTALL_CRON" == "true" ]]; then
     # Install new crontab
     crontab /tmp/cron_temp
     rm /tmp/cron_temp
+
+    # Install logrotate config
+    write_logrotate_config
     
     echo "Cron job installed successfully!"
     echo "Command: $CRON_CMD"

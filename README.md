@@ -107,16 +107,16 @@ curl -LO https://github.com/noosphere888/Ban-Knots/releases/download/v1.2.0/stan
 chmod +x standalone-ban-knots.sh
 ```
 
-3. Ensure you have `jq` installed:
+3. Ensure you have `jq` and `logrotate` installed:
 ```bash
 # Ubuntu/Debian
-sudo apt-get install jq
+sudo apt-get install jq logrotate
 
 # macOS
-brew install jq
+brew install jq logrotate
 
 # RHEL/CentOS/Fedora
-sudo yum install jq
+sudo yum install jq logrotate
 ```
 
 ## Authentication Methods
